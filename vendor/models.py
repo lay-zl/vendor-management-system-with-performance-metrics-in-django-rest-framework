@@ -27,7 +27,7 @@ class PurchesOrder(models.Model):
     issue_date = models.DateTimeField(null=True,blank=True)
     acknowledgment_date = models.DateTimeField(null=True,blank=True)
 
-
+0
 class HistoricalPerformancesModel(models.Model):
     vendor = models.ForeignKey(Vendor,on_delete=models.CASCADE,related_name='HistoricalPerformances')
     date = models.DateTimeField()

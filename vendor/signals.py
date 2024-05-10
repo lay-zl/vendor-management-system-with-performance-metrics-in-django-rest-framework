@@ -7,14 +7,19 @@ from django.utils import timezone
 
 @receiver(post_save, sender=PurchesOrder)
 def update_vendor_performance(sender, instance, **kwargs):
-    if instance.status == 'completed' and instance.delivered_data is None:
-        instance.delivered_data = timezone.now()
+    if instance.status == 'completed' and instance.delivery_date is None:
+        instance.delivery_date = timezone.now()
         instance.save()
 
     # Update On-Time Delivery Rate
     completed_orders = PurchesOrder.objects.filter(vendor=instance.vendor, status='completed')
     on_time_deliveries = completed_orders.filter(delivery_date__gte=F('delivery_date'))
-    on_time_delivery_rate = on_time_deliveries.count() / completed_orders.count()
+
+    try:
+        on_time_delivery_rate = on_time_deliveries.count() / completed_orders.count()
+    except ZeroDivisionError as e:
+        print(e)
+        on_time_delivery_rate=0
     if on_time_delivery_rate:
         instance.vendor.on_time_delivery_rate = on_time_delivery_rate
     else:
@@ -51,4 +56,3 @@ def update_fulfillment_rate(sender, instance, **kwargs):
     fulfillment_rate = fulfilled_orders.count() / PurchesOrder.objects.filter(vendor=instance.vendor).count()
     instance.vendor.fulfillment_rate = fulfillment_rate
     instance.vendor.save()
-

@@ -191,7 +191,7 @@ class AcknowledgePurchaseOrderView(generics.UpdateAPIView):
         response_times = PurchesOrder.objects.filter(vendor=instance.vendor, acknowledgment_date__isnull=False).values_list('acknowledgment_date', 'issue_date')
         average_response_time = sum(abs((ack_date - issue_date).total_seconds()) for ack_date, issue_date in response_times) #/ len(response_times)
         if response_times:
-            average_response_time = total_seconds / len(response_times)
+            average_response_time = average_response_time / len(response_times)
         else:
             average_response_time = 0  # Avoid division by zero if there are no response times
         instance.vendor.average_response_time = average_response_time
